@@ -36,11 +36,3 @@ timeago==1.0.16
 typing_extensions==4.12.2
 urllib3==2.2.2
 webencodings==0.5.1
-winrt-runtime==2.0.0b1
-winrt-Windows.Devices.Bluetooth==2.0.0b1
-winrt-Windows.Devices.Bluetooth.Advertisement==2.0.0b1
-winrt-Windows.Devices.Bluetooth.GenericAttributeProfile==2.0.0b1
-winrt-Windows.Devices.Enumeration==2.0.0b1
-winrt-Windows.Foundation==2.0.0b1
-winrt-Windows.Foundation.Collections==2.0.0b1
-winrt-Windows.Storage.Streams==2.0.0b1
