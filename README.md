@@ -2,6 +2,10 @@
 
 Meshtastic Chat Desktop is a desktop application designed for Meshtastic device users who want to send and receive messages using their Meshtastic device via their desktop. The application supports Windows, Linux, and Raspberry Pi.
 
+To run :
+pip install -r requirements.txt
+python meshtastic_chat_desktop.py
+
 ![Screenshot 1](ScreenShots/MainScreen1.JPG)
 ![Screenshot 2](ScreenShots/MainScreen2.JPG)
 
