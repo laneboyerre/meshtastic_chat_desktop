@@ -4,6 +4,7 @@ Meshtastic Chat Desktop is a desktop application designed for Meshtastic device 
 
 To run :
 pip install -r requirements.txt
+
 python meshtastic_chat_desktop.py
 
 ![Screenshot 1](ScreenShots/MainScreen1.JPG)
