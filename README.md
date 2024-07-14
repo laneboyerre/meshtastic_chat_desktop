@@ -8,7 +8,7 @@ pip install -r requirements.txt
 
 python meshtastic_chat_desktop.py
 
-![Screenshot 1](ScreenShots/MainScreen1.JPG)
+![Screenshot 1](develop/ScreenShots/MainScreen1.JPG)
 ![Screenshot 2](ScreenShots/MainScreen2.JPG)
 ![Screenshot 2](ScreenShots/MainScreen3.JPG)
 ![Screenshot 2](ScreenShots/FlaskInterface.JPG)
