@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: winrt-Windows.Foundation.Collections
+Version: 2.0.0b1
+Summary: Python projection of Windows Runtime (WinRT) APIs
+License: MIT
+Project-URL: Repository, https://github.com/pywrint/pywrinrt
+Project-URL: Changelog, https://github.com/pywinrt/pywinrt/blob/main/CHANGELOG.md
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Intended Audience :: Developers
+Requires-Python: <3.13,>=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: winrt-runtime ==2.0.0-beta.1
+Provides-Extra: all
+Requires-Dist: winrt-Windows.Foundation[all] ==2.0.0-beta.1 ; extra == 'all'
+
+<!-- warning: Please don't edit this file. It was automatically generated. -->
+
+# winrt-Windows.Foundation.Collections
+
+Windows Runtime (WinRT) APIs for for the `Windows.Foundation.Collections` namespace.
+
+This package provides the `winrt.windows.foundation.collections` module.

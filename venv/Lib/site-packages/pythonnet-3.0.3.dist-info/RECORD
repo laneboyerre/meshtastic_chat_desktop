@@ -1,0 +1,17 @@
+__pycache__/clr.cpython-312.pyc,,
+clr.py,sha256=9LJE8vehgQqkCBTDXaB4VUBbdQeDbSs5zmZ283dHLRU,96
+pythonnet-3.0.3.dist-info/AUTHORS.md,sha256=ujM7JbW-qaex1j7NW6VOGn1h8TIGzGh4l4oIbiPjHhI,4857
+pythonnet-3.0.3.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+pythonnet-3.0.3.dist-info/LICENSE,sha256=4dw6b_AXpoANwnpyIFAPUSuV-82ZbTjru_-FxpMkU2k,1104
+pythonnet-3.0.3.dist-info/METADATA,sha256=tZNLCNTKWUXkZOqW60VCL3VzP1FYNs8iQANnzBMJDco,6573
+pythonnet-3.0.3.dist-info/RECORD,,
+pythonnet-3.0.3.dist-info/WHEEL,sha256=yQN5g4mg4AybRjkgi-9yy4iQEFibGQmlz78Pik5Or-A,92
+pythonnet-3.0.3.dist-info/top_level.txt,sha256=t_cWGAdMpwl7YO793-aNxNpIEUQhODegjRUXXd1alfA,14
+pythonnet/.gitignore,sha256=Nf87sbYHhmFOyPXmo0d8sxgjfTQODwoiI-SapnZGKFc,22
+pythonnet/__init__.py,sha256=XtllPI_8M3wOGAIP3oJ_nesfPFY4Ctj8WqyCGB4pJ6c,5195
+pythonnet/__pycache__/__init__.cpython-312.pyc,,
+pythonnet/runtime/.gitkeep,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+pythonnet/runtime/Python.Runtime.deps.json,sha256=1K_KLH_41xLmCIjG1n7OZBjr58Nvuqx7GOc1K9upU78,9851
+pythonnet/runtime/Python.Runtime.dll,sha256=IoIoaQI0gubRUxSoy9fLcA5cHvTYns_2X_QUSxhA2nk,431104
+pythonnet/runtime/Python.Runtime.pdb,sha256=7W0p042i7EfjhxXzg4vbELeqQ1zLRUYWtKGcNDkPjOs,193304
+pythonnet/runtime/Python.Runtime.xml,sha256=n3gTXhdcYlt-ldAyj-74ht0Aitn1HVGNEs9BQYTeyJk,184718

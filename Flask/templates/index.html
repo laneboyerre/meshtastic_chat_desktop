@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meshtastic Chat</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Meshtastic Chat</h1>
+        <div class="controls">
+            <label for="subscriberId">Subscriber ID</label>
+            <input type="text" id="subscriberId" placeholder="Subscriber ID" required>
+            <label for="verbose">Verbose</label>
+            <input type="checkbox" id="verbose">
+            <button id="subscribeBtn">Subscribe</button>
+            <button id="unsubscribeBtn">Unsubscribe</button>
+        </div>
+        <div class="collapsible">
+            <button type="button" class="collapsible-header" id="toggleMessagesBtn">Toggle Message History</button>
+            <div class="collapsible-content" id="messagesContainer">
+                <div class="messages-container" id="messages"></div>
+            </div>
+        </div>
+        <div class="collapsible">
+            <button type="button" class="collapsible-header" id="toggleIpDataBtn">Toggle IP Data</button>
+            <div class="collapsible-content" id="ipDataContainer">
+                <div class="ip-data-container" id="ipData"></div>
+            </div>
+        </div>
+        <form id="messageForm" class="form-control">
+            <input type="text" id="destinationIdInput" placeholder="Destination ID" required>
+            <input type="number" id="channelIndexInput" placeholder="Channel Index" value="0" required>
+            <input type="text" id="messageInput" placeholder="Type a message" required>
+            <button type="submit">Send Message</button>
+        </form>
+        <form id="dataForm" class="form-control">
+            <input type="text" id="destinationIdDataInput" placeholder="Destination ID" required>
+            <input type="number" id="channelIndexDataInput" placeholder="Channel Index" value="0" required>
+            <input type="text" id="dataInput" placeholder="Type data to send" required>
+            <button type="submit">Send Data</button>
+        </form>
+        <form id="fileForm" class="form-control" enctype="multipart/form-data">
+            <input type="text" id="destinationIdFileInput" placeholder="Destination ID" required>
+            <input type="number" id="channelIndexFileInput" placeholder="Channel Index" value="0" required>
+            <input type="file" id="fileInput" required>
+            <button type="submit">Send File</button>
+        </form>
+        <form id="sendIpDataForm" class="form-control">
+            <input type="text" id="destinationIdSendIpDataInput" placeholder="Destination ID" required>
+            <input type="text" id="sendIpDataUrlInput" placeholder="IP Data URL" required>
+            <input type="number" id="channelIndexSendIpDataInput" placeholder="Channel Index" value="0" required>
+            <button type="submit">Send IP Data</button>
+        </form>
+        <form id="requestIpDataForm" class="form-control">
+            <input type="text" id="destinationIdRequestIpDataInput" placeholder="Destination ID" required>
+            <input type="text" id="requestIpDataUrlInput" placeholder="IP Data URL" required>
+            <input type="number" id="channelIndexRequestIpDataInput" placeholder="Channel Index" value="0" required>
+            <button type="submit">Request IP Data</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+[console_scripts]
+mesh-tunnel=meshtastic.__main__:tunnelMain[tunnel]
+meshtastic=meshtastic.__main__:main
+
