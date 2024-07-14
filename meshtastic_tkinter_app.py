@@ -14,6 +14,7 @@ class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
         canvas = tk.Canvas(self)
+        canvas.config(width=975, height=600)
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
         self.scrollable_frame = ttk.Frame(canvas)
 
@@ -29,6 +30,8 @@ class ScrollableFrame(ttk.Frame):
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        style = ttk.Style()
+        style.theme_use("default")
 
 class MeshtasticTkinterApp:
     def __init__(self, master):
