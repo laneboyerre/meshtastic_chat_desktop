@@ -377,7 +377,8 @@ class MeshtasticChatApp:
                 wantResponse=False,  # No response needed for chunks
                 channelIndex=channel_index
             )
-            time.sleep(0.05)  # Add a delay between sending chunks
+            # TODO: Make the delay related and set by the speed of the radio
+            time.sleep(0.2)  # Add a delay between sending chunks
 
             if progress_callback:
                 progress_callback(i + 1, total_chunks)
