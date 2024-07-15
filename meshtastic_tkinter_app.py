@@ -7,6 +7,7 @@ import base64
 import webview
 from Class.meshtastic_chat_app import MeshtasticChatApp  # Import your existing class
 import platform
+import serial.tools.list_ports
 
 CHUNK_SIZE = 100  # Define CHUNK_SIZE here
 
@@ -84,7 +85,11 @@ class MeshtasticTkinterApp:
     def setup_ui(self):
         # Device Path
         ttk.Label(self.frame, text="Device Path:").grid(row=0, column=0, padx=10, pady=5)
-        ttk.Entry(self.frame, textvariable=self.device_path).grid(row=0, column=1, padx=10, pady=5)
+        options = [port.device for port in serial.tools.list_ports.comports()]  # Get a list of paths
+        dropdown = ttk.Combobox(self.frame, textvariable=self.device_path)
+        dropdown['values'] = options
+        dropdown.set('')  # Set default value
+        dropdown.grid(row=0, column=1, padx=10, pady=5)
         ttk.Button(self.frame, text="Connect", command=self.connect_device).grid(row=0, column=2, padx=10, pady=5)
 
         # Timeout
@@ -263,6 +268,8 @@ class MeshtasticTkinterApp:
     def connect_device(self):
         device_path = self.device_path.get()
         if device_path:
+            if self.chat_app:
+                self.chat_app.interface.close()
             self.chat_app = MeshtasticChatApp(
                 dev_path=device_path, 
                 destination_id=self.destination_id.get(),
@@ -584,7 +591,7 @@ class MeshtasticTkinterApp:
             self.server_button.config(text="Run Server")
         else:
             self.chat_app.start_flask_server()
-            self.server_status_label.config(text="Server Status: Running", foreground="green")
+            self.server_status_label.config(text="Server Status: Running [port:5003]", foreground="green")
             self.server_button.config(text="Stop Server")
     
     def run(self):
