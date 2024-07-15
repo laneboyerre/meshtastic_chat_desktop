@@ -10,6 +10,7 @@ import platform
 import serial.tools.list_ports
 
 CHUNK_SIZE = 100  # Define CHUNK_SIZE here
+STYLE = 'default'  # Set the style to be used for the ttk widgets
 
 class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
@@ -32,11 +33,14 @@ class ScrollableFrame(ttk.Frame):
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         style = ttk.Style()
-        style.theme_use("default")
+        style.theme_use(STYLE)
 
 class MeshtasticTkinterApp:
     def __init__(self, master):
         self.master = master
+        self.master.option_add("*Background", "white")
+        self.master.option_add("*Foreground", "black")
+        self.master.option_add("*Entry*background", "white")
         self.master.title("Meshtastic Chat App")
 
         # Create a menu bar
@@ -487,7 +491,7 @@ class MeshtasticTkinterApp:
         
         dest_id = self.destination_id.get()
         try:
-            hop_limit = int(simpledialog.askstring("Trace Route", "Enter hop limit:"))
+            hop_limit = int(simpledialog.askinteger("Trace Route", "Enter hop limit:"))
         except ValueError:
             messagebox.showerror("Error", "Invalid hop limit")
             return
