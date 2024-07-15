@@ -4,6 +4,10 @@ Attention: This version is under development!
 
 Meshtastic Chat Desktop Server is a desktop/server application designed for Meshtastic device users who want to send and receive messages using their Meshtastic device via their desktop. The application supports Windows, Linux, and Raspberry Pi.
 
+For high speed data transfer use Meshtastic CLI ( or set in app ) : meshtastic --set lora.modem_preset SHORT_FAST --set lora.channel_num 0
+
+Default setting is : meshtastic --set lora.modem_preset LONG_FAST
+
 To run :
 pip install -r requirements.txt
 
