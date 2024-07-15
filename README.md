@@ -17,7 +17,7 @@ python meshtastic_chat_desktop.py
 
 ## Features
 
-- Send and receive messages/files using Meshtastic devices
+- Send and receive messages/files/Web Browsing! (under development) using Meshtastic devices
 - Supports Windows, Linux, and Raspberry Pi
 - Easy setup with a virtual environment
 - This version is under development!
