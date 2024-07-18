@@ -27,9 +27,9 @@ if platform.system() == "Linux":
 # Enable logging but set to ERROR level to suppress debug/info messages
 logging.basicConfig(level=logging.ERROR)
 
-FILE_IDENTIFIER = b'FILEDATA:'
-ANNOUNCE_IDENTIFIER = b'FILEINFO:'
-IPDATA_IDENTIFIER = b'IPDATA:'
+FILE_IDENTIFIER = b'FILEDATA:'  # Reduce in length
+ANNOUNCE_IDENTIFIER = b'FILEINFO:'  # Reduce in length
+IPDATA_IDENTIFIER = b'IPDATA:'  # Reduce in length
 CHUNK_SIZE = 100  # Chunk size in bytes
 BROADCAST_ADDR = "^all"
 MAX_RETRIES = 5
@@ -136,6 +136,7 @@ class MeshtasticChatApp:
                                         self.retry_counts[file_name] = 0
                         elif data.decode('utf-8').startswith("File complete:"):
                             # Handle file complete message
+                            # TODO: Change this to use a shorter message, make it hash based, and cull request if needed
                             file_name = data.decode('utf-8').split(": ")[1]
                             print(Fore.GREEN + f"File complete received for {file_name}")
                             self.request_missing_chunks(file_name)
@@ -220,6 +221,7 @@ class MeshtasticChatApp:
             missing_chunks = [i for i, chunk in enumerate(self.received_chunks[file_name]) if chunk is None]
             if missing_chunks:
                 if self.retry_counts[file_name] < self.retransmission_limit:
+                    # TODO: Replace csv based system with a bin Encoded one
                     request_message = f"REQ:{file_name}:{','.join(map(str, missing_chunks))}"
                     self.interface.sendText(request_message, self.destination_id)
                     print(Fore.MAGENTA + f"Requesting missing chunks for {file_name}: {missing_chunks}")
@@ -236,6 +238,7 @@ class MeshtasticChatApp:
 
     def handle_missing_chunks(self, request_message):
         """Handle sending of missing chunks when requested"""
+        # TODO: Rework to follow new standards and change to hash based
         parts = request_message.split(':')
         if len(parts) == 3 and parts[0] == "REQ":
             file_name = parts[1]
@@ -270,6 +273,7 @@ class MeshtasticChatApp:
 
     def send_specific_chunks(self, data, file_name, chunks):
         """Send specific chunks requested by the receiver"""
+        # TODO: rework to new standard
         total_chunks = (len(data) + CHUNK_SIZE - 1) // CHUNK_SIZE
 
         for i in chunks:
@@ -294,6 +298,8 @@ class MeshtasticChatApp:
 
     # Function to save a received file
     def save_file(self, file_name, file_data):
+        # TODO: storing metadata about files in a file in the dir and put each file in a dir with the device id
+        # TODO: Make a method for packaging and sending an index of that data or just that file over to a device that requests it with a special hash
         try:
             file_path = os.path.join('received_files', file_name)
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -344,6 +350,7 @@ class MeshtasticChatApp:
 
     def announce_file(self, file_name, file_size, total_chunks):
         """Announce the file details before sending chunks"""
+        # TODO: Change file to method to be more efficient(May have to change from text to data)
         file_info = {
             "name": file_name,
             "size": file_size,
@@ -359,9 +366,11 @@ class MeshtasticChatApp:
             self.on_ack(response, event)
 
         total_chunks = (len(data) + CHUNK_SIZE - 1) // CHUNK_SIZE
+        # TODO: pack in binary and make a hash for file which compacts many of these factors into one
         self.announce_file(file_name, len(data), total_chunks)
 
         # Store chunks temporarily in memory
+        # TODO: change index to be based on hash instead of on file name
         self.sent_chunks[file_name] = [data[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE] for i in range(total_chunks)]
 
         for i in range(total_chunks):
