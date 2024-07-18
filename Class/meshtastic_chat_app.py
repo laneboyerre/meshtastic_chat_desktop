@@ -35,11 +35,12 @@ BROADCAST_ADDR = "^all"
 MAX_RETRIES = 5
 
 class MeshtasticChatApp:
-    def __init__(self, dev_path, destination_id, on_receive_callback=None, timeout=10, retransmission_limit=3):
+    def __init__(self, dev_path, destination_id, on_receive_callback=None, timeout=10, retransmission_limit=3, port=5003):
         self.dev_path = dev_path
         self.destination_id = destination_id
         self.timeout = timeout
         self.retransmission_limit = retransmission_limit
+        self.port = port
         self.interface = None
         self.received_chunks = {}
         self.acknowledged_chunks = set()
@@ -706,7 +707,7 @@ class MeshtasticChatApp:
         from Flask.flask_server import app, socketio, start_heartbeat_monitor
         app.config['chat_app'] = self
         start_heartbeat_monitor(self)
-        socketio.run(app, host='0.0.0.0', port=5003)
+        socketio.run(app, host='0.0.0.0', port=self.port)
 
     def forward_to_subscribers(self, sender_id, message, packet):
         from Flask.flask_server import socketio  # Import socketio here to ensure it's available
