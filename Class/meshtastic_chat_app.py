@@ -27,9 +27,18 @@ if platform.system() == "Linux":
 # Enable logging but set to ERROR level to suppress debug/info messages
 logging.basicConfig(level=logging.ERROR)
 
-FILE_IDENTIFIER = b'FILEDATA:'  # Reduce in length
-ANNOUNCE_IDENTIFIER = b'FILEINFO:'  # Reduce in length
-IPDATA_IDENTIFIER = b'IPDATA:'  # Reduce in length
+"""frequency can be calculated with 100 * .99**n where n is 0-255 which gives us a single byte with 0-100s resolution 
+with higher resolution in smaller numbers
+- Shorten file communications to FC[id]
+- Shorten ip communications to IC[id]"""
+FILE_IDENTIFIER = b'FILEDATA:'  # Reduce in length  'FCD[4byte truncated hash][packet_id short2byte]'
+ANNOUNCE_IDENTIFIER = b'FILEINFO:'  # Reduce in length 'FCI[full hash],[truncated file name],[num_packets]'
+ANNOUNCE_EOF = b'File complete:'  # Reduce in length 'FCE[4 byte hash]'
+FILE_REQ = b'File request:'  # Reduce in length 'FCR[4 byte hash][4 byte size][n rate]'  # Use to ack a file transfer or initiate a file request
+FILE_REQ_Missing = b'REQ:'  # Reduce in length 'FCQ[4 byte hash][n rate][% n/256][missing 2byte packet id]'
+FILE_Ack_Complete = b'REQ:'  # Reduce in length 'FCC[4 byte hash]'  # both receiver sends this instead of the req
+UPDATE_SPEED = b'NCR'  # Reduce rate to n due to too many missed packets or increase rate due to eot 'NCR[n rate]'
+IPDATA_IDENTIFIER = b'IPDATA:'  # Reduce in length 'ICI'
 CHUNK_SIZE = 100  # Chunk size in bytes
 BROADCAST_ADDR = "^all"
 MAX_RETRIES = 5
