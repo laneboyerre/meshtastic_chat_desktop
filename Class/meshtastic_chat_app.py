@@ -38,6 +38,7 @@ FILE_REQ = b'File request:'  # Reduce in length 'FCR[4 byte hash][4 byte size][n
 FILE_REQ_Missing = b'REQ:'  # Reduce in length 'FCQ[4 byte hash][n rate][% n/256][missing 2byte packet id]'
 FILE_Ack_Complete = b'REQ:'  # Reduce in length 'FCC[4 byte hash]'  # both receiver sends this instead of the req
 UPDATE_SPEED = b'NCR'  # Reduce rate to n due to too many missed packets or increase rate due to eot 'NCR[n rate]'
+ANNOUNCE_PRESENCE = b'NCA'  # Announce alias for the file server instance
 IPDATA_IDENTIFIER = b'IPDATA:'  # Reduce in length 'ICI'
 CHUNK_SIZE = 100  # Chunk size in bytes
 BROADCAST_ADDR = "^all"
