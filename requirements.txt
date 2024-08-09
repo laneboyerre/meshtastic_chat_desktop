@@ -1,0 +1,11 @@
+colorama>=0.4.6
+Flask>=3.0.3
+Flask_SocketIO>=5.3.6
+meshtastic>=2.3.14
+pandas>=2.2.2
+pytables
+protobuf>=5.27.3
+Pypubsub>=4.0.3
+pywebview>=5.1
+Requests>=2.32.3
+timeago>=1.0.16
