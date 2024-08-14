@@ -53,14 +53,20 @@ class MeshtasticTkinterApp:
         # Normal Windows Menu    
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Exit", command=master.quit)
+        
+        self.right_click_menu = tk.Menu(root, tearoff = 0) 
+        self.right_click_menu.add_command(label ="Add to Friends", command=self.add_friend_right_click) 
 
         # Variables
         self.device_path = tk.StringVar()
+        # self.device_path.set('COM5')
+    
         self.destination_id = tk.StringVar()
         self.timeout = tk.IntVar(value=30)
         self.retransmission_limit = tk.IntVar(value=3)
         self.destination_id.set("!fa6a4660")  # Default destination ID
         self.friends = []
+
 
         # Set up the scrollable frame
         self.scrollable_frame = ScrollableFrame(self.master)
@@ -73,7 +79,14 @@ class MeshtasticTkinterApp:
         self.chat_app = None  # Initialize later after setting the device path
 
         # Load friends/addresses from JSON file
-        self.load_friends()            
+        self.load_friends()        
+        
+        # auto connect if device path is set
+        if self.device_path.get():
+            self.connect_device()      
+            # auto scan 
+            self.scan_mesh()
+        
     
     def setup_ui(self):
         # Device Path
@@ -155,6 +168,7 @@ class MeshtasticTkinterApp:
         columns = ("N", "User", "ID", "AKA", "Hardware", "Latitude", "Longitude", "Battery", "Channel util.", "Tx air util.", "SNR", "Hops Away", "LastHeard", "Since")
         self.mesh_tree = ttk.Treeview(self.mesh_canvas, columns=columns, show='headings')
         self.mesh_tree.grid(row=0, column=0, sticky="nsew")
+        self.mesh_tree.bind("<Button-3>", self.right_click_popup) 
 
         # Define column headings and set default widths
         column_widths = {
@@ -246,7 +260,7 @@ class MeshtasticTkinterApp:
 
         self.add_channel_button = ttk.Button(self.channel_frame, text="Add Channel", command=self.add_channel)
         self.add_channel_button.grid(row=6, column=1, padx=5, pady=5)
-
+        
     def connect_device(self):
         device_path = self.device_path.get()
         if device_path:
@@ -270,17 +284,30 @@ class MeshtasticTkinterApp:
 
     def add_friend(self):
         new_friend = simpledialog.askstring("Add Friend", "Enter friend address:")
-        if new_friend:
-            self.friends.append(new_friend)
-            self.update_friends_list()
-            self.save_friends()
+        self.add_friend_backend(new_friend)
+    
+    def add_friend_backend(self, new_friend):
+        if not new_friend:
+            return
+        
+        if new_friend in self.friends:
+            return
+        
+        self.friends.append(new_friend)
+        self.update_friends_list()
+        self.save_friends()
 
     def remove_friend(self):
         selected_friend = self.friends_listbox.curselection()
-        if selected_friend:
-            self.friends.pop(selected_friend[0])
-            self.update_friends_list()
-            self.save_friends()
+        self.remove_friend_backend(selected_friend)
+            
+    def remove_friend_backend(self, selected_friend):
+        if not selected_friend:
+            return
+        
+        self.friends.pop(selected_friend[0])
+        self.update_friends_list()
+        self.save_friends()
 
     def update_friends_list(self):
         self.friends_listbox.delete(0, tk.END)
@@ -566,6 +593,22 @@ class MeshtasticTkinterApp:
     
     def run(self):
         self.master.mainloop()
+        
+    def right_click_popup(self, event):
+        try: 
+            self.right_click_menu.tk_popup(event.x_root, event.y_root) 
+        finally: 
+            self.right_click_menu.grab_release() 
+            
+    def add_friend_right_click(self):
+        selected_item = self.mesh_tree.item(self.mesh_tree.focus())
+        print(selected_item)
+        friend_id = selected_item.get('values')[2]
+        self.add_friend_backend(friend_id)
+        
+    def remove_friend_right_click(self):
+        selected_item = self.mesh_tree.focus()
+        print(selected_item)
 
 if __name__ == "__main__":
     root = tk.Tk()
