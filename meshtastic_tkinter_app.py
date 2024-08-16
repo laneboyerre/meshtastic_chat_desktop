@@ -334,7 +334,8 @@ class MeshtasticTkinterApp:
             except ValueError:
                 messagebox.showerror("Error", "Invalid channel index")
                 return
-            self.chat_app.send_text_message(message, channel_index)
+            threading.Thread(target=self.chat_app.send_text_message, args=(message, channel_index)).start()
+
             self.update_history(f"Me: {message}")
             self.message_entry.delete(0, tk.END)
 
