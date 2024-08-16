@@ -12,12 +12,12 @@ class FriendsManager():
         self.friends_dictionary[friend_object.radio_id] = friend_object
         self.dump_and_save()
     
-    def remove_friend(self, friend_object):
-        if type(friend_object) == str:
-            del self.friends_dictionary[friend_object]
-        else:
-            del self.friends_dictionary[friend_object.radio_id]
+    def remove_friend(self, radio_id):
+        del self.friends_dictionary[radio_id]
         self.dump_and_save()
+        
+    def get_friend(self, radio_id):
+        return self.friends_dictionary[radio_id]
     
     def dump_and_save(self):
         self.backend_interface.save(self.friends_dictionary)

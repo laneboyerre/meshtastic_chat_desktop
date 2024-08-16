@@ -9,13 +9,12 @@ class TestFriendClass(unittest.TestCase):
         
         new_friend = Friend().parse_selection_input(mock_selection)
         
-        print(new_friend.__dict__)
         self.assertEqual(
             "Meshtastic eec8",
             new_friend.username
         )
         
-        expected_values = {'radio_id': '', 'n': 4, 'username': 'Meshtastic eec8', 'id': '!7a6beec8', 'aka': 'eec8', 'hardware': 'TBEAM', 'latitude': 'x', 'longitude': 'x', 'battery': '101%', 'channel util.': 'None', 'tx air util.': '0.10%', 'snr': 'None', 'hops away': '0/unknown', 'lastheard': 'None', 'since': 'None'}
+        expected_values = {'n': 4, 'username': 'Meshtastic eec8', 'radio_id': '!7a6beec8', 'aka': 'eec8', 'hardware': 'TBEAM', 'latitude': 'x', 'longitude': 'x', 'battery': '101%', 'channel util.': 'None', 'tx air util.': '0.10%', 'snr': 'None', 'hops away': '0/unknown', 'lastheard': 'None', 'since': 'None'}
         for k, v in expected_values.items():
             self.assertEqual(
                 expected_values[k],
