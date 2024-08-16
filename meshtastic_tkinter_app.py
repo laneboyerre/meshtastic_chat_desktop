@@ -8,6 +8,10 @@ import webview
 from Class.meshtastic_chat_app import MeshtasticChatApp  # Import your existing class
 import platform
 import serial.tools.list_ports
+ 
+from Class.friends_modules.FriendsManager import FriendsManager
+from Class.friends_modules.PickleFriendInterfaceImpl import PickleFriendInterface
+from Class.friends_modules.friend import Friend
 
 CHUNK_SIZE = 100  # Define CHUNK_SIZE here
 STYLE = 'default'  # Set the style to be used for the ttk widgets
@@ -60,6 +64,11 @@ class MeshtasticTkinterApp:
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Exit", command=master.quit)
         
+        self.right_click_menu = tk.Menu(root, tearoff = 0) 
+        self.right_click_menu.add_command(label ="Add to Friends", command=self.add_friend_right_click) 
+        
+        self.FriendManager = FriendsManager(PickleFriendInterface())
+        
         # Create a View menu
         self.view_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="View", menu=self.view_menu)
@@ -71,7 +80,7 @@ class MeshtasticTkinterApp:
         self.timeout = tk.IntVar(value=30)
         self.retransmission_limit = tk.IntVar(value=3)
         self.destination_id.set("!fa6a4660")  # Default destination ID
-        self.friends = []
+        
 
         # Set up the scrollable frame
         self.scrollable_frame = ScrollableFrame(self.master)
@@ -83,8 +92,7 @@ class MeshtasticTkinterApp:
 
         self.chat_app = None  # Initialize later after setting the device path
 
-        # Load friends/addresses from JSON file
-        self.load_friends()            
+        
     
     def setup_ui(self):
         # Device Path
@@ -170,6 +178,8 @@ class MeshtasticTkinterApp:
         columns = ("N", "User", "ID", "AKA", "Hardware", "Latitude", "Longitude", "Battery", "Channel util.", "Tx air util.", "SNR", "Hops Away", "LastHeard", "Since")
         self.mesh_tree = ttk.Treeview(self.mesh_canvas, columns=columns, show='headings')
         self.mesh_tree.grid(row=0, column=0, sticky="nsew")
+        
+        self.mesh_tree.bind("<Button-3>", self.right_click_popup) 
 
         # Define column headings and set default widths
         column_widths = {
@@ -268,6 +278,8 @@ class MeshtasticTkinterApp:
 
         self.server_button = ttk.Button(self.frame, text="Run Server", command=self.toggle_server)
         self.server_button.grid(row=8, column=1, padx=10, pady=5)
+        
+        self.update_friends_list()
 
     def connect_device(self):
         device_path = self.device_path.get()
@@ -293,33 +305,21 @@ class MeshtasticTkinterApp:
         self.update_output(f"Destination ID set to {selected_friend}")
 
     def add_friend(self):
-        new_friend = simpledialog.askstring("Add Friend", "Enter friend address:")
-        if new_friend:
-            self.friends.append(new_friend)
+        radio_id = simpledialog.askstring("Add Friend", "Enter friend address:")
+        if radio_id:
+            self.FriendManager.add_friend(Friend(radio_id))
             self.update_friends_list()
-            self.save_friends()
 
     def remove_friend(self):
-        selected_friend = self.friends_listbox.curselection()
+        selected_friend = self.friends_listbox.get(self.friends_listbox.curselection())
         if selected_friend:
-            self.friends.pop(selected_friend[0])
+            self.FriendManager.remove_friend(selected_friend)
             self.update_friends_list()
-            self.save_friends()
 
     def update_friends_list(self):
         self.friends_listbox.delete(0, tk.END)
-        for friend in self.friends:
+        for friend, metadata in self.FriendManager.friends_dictionary.items():
             self.friends_listbox.insert(tk.END, friend)
-
-    def save_friends(self):
-        with open("friends.json", "w") as file:
-            json.dump(self.friends, file)
-
-    def load_friends(self):
-        if os.path.exists("friends.json"):
-            with open("friends.json", "r") as file:
-                self.friends = json.load(file)
-            self.update_friends_list()
 
     def send_message(self):
         if not self.chat_app:
@@ -382,7 +382,7 @@ class MeshtasticTkinterApp:
                 file_data = file.read()
                 file_name = os.path.basename(file_path)
                 self.chat_app.send_data_in_chunks(file_data, file_name, progress_callback, channel_index)
-                self.update_history(f"Me: Sent file {file_name}")
+                self.update_history(f"Me: Sent filefrom Class.friends_modules.friend import Friend {file_name}")
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send file: {str(e)}")
@@ -597,6 +597,17 @@ class MeshtasticTkinterApp:
             self.chat_app.start_flask_server()
             self.server_status_label.config(text="Server Status: Running [port:5003]", foreground="green")
             self.server_button.config(text="Stop Server")
+            
+    def add_friend_right_click(self):
+        selected_item = self.mesh_tree.item(self.mesh_tree.focus())
+        self.FriendManager.add_friend(Friend().parse_selection_input(selected_item))
+        self.update_friends_list()
+        
+    def right_click_popup(self, event):
+        try: 
+            self.right_click_menu.tk_popup(event.x_root, event.y_root) 
+        finally: 
+            self.right_click_menu.grab_release() 
     
     def run(self):
         self.master.mainloop()
