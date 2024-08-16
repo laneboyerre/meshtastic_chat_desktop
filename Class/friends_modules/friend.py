@@ -8,7 +8,6 @@ class Friend():
     
     def parse_selection_input(self, selection):
         mapped_values_list = ["N", "username", "radio_id", "AKA", "Hardware", "Latitude", "Longitude", "Battery", "Channel util.", "Tx air util.", "SNR", "Hops Away", "LastHeard", "Since"]
-        print(selection)
         for i in range(0, len(mapped_values_list)):
             setattr(self, mapped_values_list[i].lower(), selection['values'][i])
         

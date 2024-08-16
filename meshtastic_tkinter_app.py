@@ -179,7 +179,10 @@ class MeshtasticTkinterApp:
         self.mesh_tree = ttk.Treeview(self.mesh_canvas, columns=columns, show='headings')
         self.mesh_tree.grid(row=0, column=0, sticky="nsew")
         
-        self.mesh_tree.bind("<Button-3>", self.right_click_popup) 
+        if platform.system() == "Darwin":
+            self.mesh_tree.bind("<Button-2>", self.right_click_popup) 
+        else:
+            self.mesh_tree.bind("<Button-3>", self.right_click_popup) 
 
         # Define column headings and set default widths
         column_widths = {

@@ -7,7 +7,7 @@ import os
 class TestPickleImpl(unittest.TestCase):
 
     def test_reading_and_writing(self):
-        testing_location = "./tests/friends_modules_tests"
+        testing_location = os.path.dirname(__file__)
         impl = PickleFriendInterface(testing_location)
         
         friends_dict = {
