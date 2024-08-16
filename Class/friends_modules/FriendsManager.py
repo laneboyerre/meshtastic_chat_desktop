@@ -3,9 +3,7 @@ import json
 
 from Class.friends_modules.GenericFriendDataInterface import GenericFriendDataInterface
 class FriendsManager():
-    
-    friends_dictionary = {}
-    
+
     def __init__(self, generic_friend_interface: GenericFriendDataInterface) -> None:
         self.backend_interface = generic_friend_interface
         self.friends_dictionary = generic_friend_interface.load()

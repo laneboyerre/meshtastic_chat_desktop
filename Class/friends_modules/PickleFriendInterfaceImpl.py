@@ -6,8 +6,6 @@ import pickle
 DATA_FOLDER = './program_data'
 PICKLE_FILE_NAME = 'friends.pickle'
 
-
-
 class PickleFriendInterface(GenericFriendDataInterface):
     
     def __init__(self, folder = DATA_FOLDER) -> None:
@@ -24,7 +22,6 @@ class PickleFriendInterface(GenericFriendDataInterface):
     def save(self, friends_dictionary):
         with open(self.file_location, 'wb') as handle:
             pickle.dump(friends_dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
             
     def update(self):
         pass
