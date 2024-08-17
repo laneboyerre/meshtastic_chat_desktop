@@ -3,14 +3,26 @@ from tkinter import ttk, filedialog, messagebox, simpledialog
 import threading
 import json
 import os
+import argparse
 import base64
 import webview
 from Class.meshtastic_chat_app import MeshtasticChatApp  # Import your existing class
 import platform
 import serial.tools.list_ports
+ 
+from Class.friends_modules.FriendsManager import FriendsManager
+from Class.friends_modules.PickleFriendInterfaceImpl import PickleFriendInterface
+from Class.friends_modules.friend import Friend
+from Class.storage_manager_modules.storage_manager import StorageManager, SettingsManager
+
+import logging
+logger = logging.getLogger()
 
 CHUNK_SIZE = 100  # Define CHUNK_SIZE here
 STYLE = 'default'  # Set the style to be used for the ttk widgets
+
+debug = False
+dev = False
 
 class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
@@ -42,6 +54,8 @@ class MeshtasticTkinterApp:
         self.master.option_add("*Foreground", "black")
         self.master.option_add("*Entry*background", "white")
         self.master.title("Meshtastic Chat App")
+        
+        
 
         # Create a menu bar
         self.menu_bar = tk.Menu(master)
@@ -60,6 +74,16 @@ class MeshtasticTkinterApp:
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Exit", command=master.quit)
         
+        self.right_click_menu = tk.Menu(root, tearoff = 0) 
+        self.right_click_menu.add_command(label ="Add to Friends", command=self.add_friend_right_click) 
+        
+        self.StorageManager = StorageManager(dev=dev, debug=debug)
+        self.SettingsManager = SettingsManager(self.StorageManager.settings_path) 
+        self.settings = self.SettingsManager.settings
+        self.FriendManager = FriendsManager(PickleFriendInterface(
+            folder=self.StorageManager.app_data_folder
+        ))
+        
         # Create a View menu
         self.view_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="View", menu=self.view_menu)
@@ -71,20 +95,20 @@ class MeshtasticTkinterApp:
         self.timeout = tk.IntVar(value=30)
         self.retransmission_limit = tk.IntVar(value=3)
         self.destination_id.set("!fa6a4660")  # Default destination ID
-        self.friends = []
+        
 
         # Set up the scrollable frame
         self.scrollable_frame = ScrollableFrame(self.master)
         self.scrollable_frame.pack(fill="both", expand=True)
         self.frame = self.scrollable_frame.scrollable_frame
 
+        
+        self.chat_app = None  
         # Set up the UI elements
         self.setup_ui()
 
-        self.chat_app = None  # Initialize later after setting the device path
 
-        # Load friends/addresses from JSON file
-        self.load_friends()            
+        
     
     def setup_ui(self):
         # Device Path
@@ -92,10 +116,13 @@ class MeshtasticTkinterApp:
         options = [port.device for port in serial.tools.list_ports.comports()]  # Get a list of paths
         dropdown = ttk.Combobox(self.frame, textvariable=self.device_path)
         dropdown['values'] = options
-        dropdown.set('')  # Set default value
+        _default_device = ""
+        if "device_settings" in self.settings:
+            _default_device = self.settings.get("device_settings").get("device_path")
+        dropdown.set(_default_device)  # Set default value
         dropdown.grid(row=0, column=1, padx=10, pady=5)
-        ttk.Button(self.frame, text="Connect", command=self.connect_device).grid(row=0, column=2, padx=10, pady=5)
-
+        ttk.Button(self.frame, text="Connect", command=self._connect_device_thread).grid(row=0, column=2, padx=10, pady=5)
+        
         # Timeout
         ttk.Label(self.frame, text="Timeout (s):").grid(row=1, column=0, padx=10, pady=5)
         ttk.Entry(self.frame, textvariable=self.timeout).grid(row=1, column=1, padx=10, pady=5)
@@ -170,6 +197,11 @@ class MeshtasticTkinterApp:
         columns = ("N", "User", "ID", "AKA", "Hardware", "Latitude", "Longitude", "Battery", "Channel util.", "Tx air util.", "SNR", "Hops Away", "LastHeard", "Since")
         self.mesh_tree = ttk.Treeview(self.mesh_canvas, columns=columns, show='headings')
         self.mesh_tree.grid(row=0, column=0, sticky="nsew")
+        
+        if platform.system() == "Darwin":
+            self.mesh_tree.bind("<Button-2>", self.right_click_popup) 
+        else:
+            self.mesh_tree.bind("<Button-3>", self.right_click_popup) 
 
         # Define column headings and set default widths
         column_widths = {
@@ -268,20 +300,52 @@ class MeshtasticTkinterApp:
 
         self.server_button = ttk.Button(self.frame, text="Run Server", command=self.toggle_server)
         self.server_button.grid(row=8, column=1, padx=10, pady=5)
+        
+        self.update_friends_list()
+        if dropdown.get():
+            self._connect_device_thread()
 
+
+    def _connect_device_thread(self):
+        threading.Thread(target=self.connect_device).start()
+    
     def connect_device(self):
         device_path = self.device_path.get()
         if device_path:
             if self.chat_app:
                 self.chat_app.interface.close()
-            self.chat_app = MeshtasticChatApp(
-                dev_path=device_path, 
-                destination_id=self.destination_id.get(),
-                on_receive_callback=self.update_output,
-                timeout=self.timeout.get(),
-                retransmission_limit=self.retransmission_limit.get()
-            )
-            self.update_output("Connected to the Meshtastic device successfully.")
+            try:
+                self.update_output(
+                    f"Attempting to connect to {device_path}..."
+                )
+                self.chat_app = MeshtasticChatApp(
+                    dev_path=device_path, 
+                    destination_id=self.destination_id.get(),
+                    on_receive_callback=self.update_output,
+                    timeout=self.timeout.get(),
+                    retransmission_limit=self.retransmission_limit.get()
+                )
+                self.scan_mesh()
+                settings = {
+                    "connection_interface": "serial",
+                    "device_path": device_path
+                }
+                self.settings["device_settings"] = settings
+                self.SettingsManager.save()
+                self.update_output(
+                    f"Connected to the Meshtastic device successfully.",
+                    message_type="SUCCESS"
+                )
+            except Exception as e:
+                self.update_output(
+                    f"Error Connecting to device",
+                    message_type="ERROR"
+                )
+                self.update_output(
+                    e,
+                    message_type="ERROR"
+                )
+                messagebox.showerror("Error", "Could not connect to device, try checking the connection.")
 
     def on_friend_select(self, event):
         if not self.friends_listbox.curselection():
@@ -293,33 +357,21 @@ class MeshtasticTkinterApp:
         self.update_output(f"Destination ID set to {selected_friend}")
 
     def add_friend(self):
-        new_friend = simpledialog.askstring("Add Friend", "Enter friend address:")
-        if new_friend:
-            self.friends.append(new_friend)
+        radio_id = simpledialog.askstring("Add Friend", "Enter friend address:")
+        if radio_id:
+            self.FriendManager.add_friend(Friend(radio_id))
             self.update_friends_list()
-            self.save_friends()
 
     def remove_friend(self):
-        selected_friend = self.friends_listbox.curselection()
+        selected_friend = self.friends_listbox.get(self.friends_listbox.curselection())
         if selected_friend:
-            self.friends.pop(selected_friend[0])
+            self.FriendManager.remove_friend(selected_friend)
             self.update_friends_list()
-            self.save_friends()
 
     def update_friends_list(self):
         self.friends_listbox.delete(0, tk.END)
-        for friend in self.friends:
+        for friend, metadata in self.FriendManager.friends_dictionary.items():
             self.friends_listbox.insert(tk.END, friend)
-
-    def save_friends(self):
-        with open("friends.json", "w") as file:
-            json.dump(self.friends, file)
-
-    def load_friends(self):
-        if os.path.exists("friends.json"):
-            with open("friends.json", "r") as file:
-                self.friends = json.load(file)
-            self.update_friends_list()
 
     def send_message(self):
         if not self.chat_app:
@@ -334,7 +386,8 @@ class MeshtasticTkinterApp:
             except ValueError:
                 messagebox.showerror("Error", "Invalid channel index")
                 return
-            self.chat_app.send_text_message(message, channel_index)
+            threading.Thread(target=self.chat_app.send_text_message, args=(message, channel_index)).start()
+
             self.update_history(f"Me: {message}")
             self.message_entry.delete(0, tk.END)
 
@@ -382,7 +435,7 @@ class MeshtasticTkinterApp:
                 file_data = file.read()
                 file_name = os.path.basename(file_path)
                 self.chat_app.send_data_in_chunks(file_data, file_name, progress_callback, channel_index)
-                self.update_history(f"Me: Sent file {file_name}")
+                self.update_history(f"Me: Sent filefrom Class.friends_modules.friend import Friend {file_name}")
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send file: {str(e)}")
@@ -597,11 +650,39 @@ class MeshtasticTkinterApp:
             self.chat_app.start_flask_server()
             self.server_status_label.config(text="Server Status: Running [port:5003]", foreground="green")
             self.server_button.config(text="Stop Server")
+            
+    def add_friend_right_click(self):
+        selected_item = self.mesh_tree.item(self.mesh_tree.focus())
+        self.FriendManager.add_friend(Friend().parse_selection_input(selected_item))
+        self.update_friends_list()
+        
+    def right_click_popup(self, event):
+        try: 
+            self.right_click_menu.tk_popup(event.x_root, event.y_root) 
+        finally: 
+            self.right_click_menu.grab_release() 
     
     def run(self):
         self.master.mainloop()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument('--debug', help='Include this to enable debug mode', action='store_true')
+    parser.add_argument('--dev', help='This flag will use repo directories for folders and files, its absence will read from the machines appdata folder.', action='store_true')
+    args = parser.parse_args()
+    debug = args.debug
+    dev = args.dev
+    print(dev)
+    if dev:
+        logger.setLevel(logging.INFO)
+        logger.info(f"Developer mode enabled: {dev}")
+        
+    if debug:
+        logger.setLevel(logging.DEBUG)
+        logger.debug(f"Debug mode active")
+
+    
     root = tk.Tk()
     app = MeshtasticTkinterApp(root)
     app.run()

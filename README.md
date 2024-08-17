@@ -41,6 +41,27 @@ git clone https://github.com/laneboyerre/meshtastic_chat_desktop.git
 cd meshtastic_chat_desktop
 
 ```
+
+### Running Unit Tests:
+
+We are currently using ```pytest``` and it should have installed after running ```pip install -r requirements.txt```
+
+When ready to run unit tests, run ```pytest``` from the root dir of the repo.
+
+```
+$ pytest
+================= test session starts==================================================
+platform win32 -- Python 3.10.7, pytest-7.3.1, pluggy-1.0.0
+rootdir: F:\Documents\workdir\meshtastic_chat_desktop
+configfile: pytest.ini
+plugins: anyio-3.6.1
+collected 2 items
+
+tests\friends_modules_tests\friend_tests.py .                                                                                                                                                                  [ 50%] tests\friends_modules_tests\pickle_impl_tests.py .                                                                                                                                                             [100%] 
+
+================= 2 passed in 0.12s =========================
+
+```
 ### Additional Tips:
 
 - **Please email lane.boyer.re@gmail.com for any feature requests or trouble shooting.
