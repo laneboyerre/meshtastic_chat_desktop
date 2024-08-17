@@ -3,12 +3,12 @@ from Class.friends_modules.GenericFriendDataInterface import GenericFriendDataIn
 import os
 import pickle
 
-DATA_FOLDER = './program_data'
+data_folder = './program_data'
 PICKLE_FILE_NAME = 'friends.pickle'
 
 class PickleFriendInterface(GenericFriendDataInterface):
     
-    def __init__(self, folder = DATA_FOLDER) -> None:
+    def __init__(self, folder = data_folder) -> None:
         self.data_folder = folder
         self.file_location = f"{self.data_folder}/{PICKLE_FILE_NAME}"
     

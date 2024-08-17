@@ -76,7 +76,9 @@ class MeshtasticTkinterApp:
         self.right_click_menu = tk.Menu(root, tearoff = 0) 
         self.right_click_menu.add_command(label ="Add to Friends", command=self.add_friend_right_click) 
         
-        self.FriendManager = FriendsManager(PickleFriendInterface())
+        self.FriendManager = FriendsManager(PickleFriendInterface(
+            folder=self.storage_manager.app_data_folder
+        ))
         
         # Create a View menu
         self.view_menu = tk.Menu(self.menu_bar, tearoff=0)
