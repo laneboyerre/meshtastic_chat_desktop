@@ -3,6 +3,7 @@ from tkinter import ttk, filedialog, messagebox, simpledialog
 import threading
 import json
 import os
+import argparse
 import base64
 import webview
 from Class.meshtastic_chat_app import MeshtasticChatApp  # Import your existing class
@@ -12,9 +13,15 @@ import serial.tools.list_ports
 from Class.friends_modules.FriendsManager import FriendsManager
 from Class.friends_modules.PickleFriendInterfaceImpl import PickleFriendInterface
 from Class.friends_modules.friend import Friend
+from Class.storage_manager_modules.storage_manager import StorageManager
+import logging
+logger = logging.getLogger()
 
 CHUNK_SIZE = 100  # Define CHUNK_SIZE here
 STYLE = 'default'  # Set the style to be used for the ttk widgets
+
+debug = False
+dev = False
 
 class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
@@ -46,6 +53,8 @@ class MeshtasticTkinterApp:
         self.master.option_add("*Foreground", "black")
         self.master.option_add("*Entry*background", "white")
         self.master.title("Meshtastic Chat App")
+        
+        self.storage_manager = StorageManager(debug=debug, dev=dev)
 
         # Create a menu bar
         self.menu_bar = tk.Menu(master)
@@ -617,6 +626,22 @@ class MeshtasticTkinterApp:
         self.master.mainloop()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument('--debug', help='Include this to enable debug mode', action='store_true')
+    parser.add_argument('--dev', help='This flag will use repo directories for folders and files, its absence will read from the machines appdata folder.', action='store_true')
+    args = parser.parse_args()
+    debug = args.debug
+    dev = args.dev
+    
+    if dev:
+        logger.info(f"Developer mode enabled: {dev}")
+        logger.info("Application data will be stored in repo/program_data")
+        
+    if debug:
+        logger.setLevel(logging.DEBUG)
+        logger.debug(f"Debug mode active")
+    
     root = tk.Tk()
     app = MeshtasticTkinterApp(root)
     app.run()

@@ -1,5 +1,3 @@
-import os
-import json
 
 from Class.friends_modules.GenericFriendDataInterface import GenericFriendDataInterface
 class FriendsManager():
