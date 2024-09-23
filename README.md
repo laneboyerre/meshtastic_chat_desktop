@@ -30,9 +30,8 @@ Clone the repository to your local machine:
 ```sh
 git clone https://github.com/laneboyerre/meshtastic_chat_desktop.git
 cd meshtastic_chat_desktop
+```
 
 ### Additional Tips:
 
 - **Please email lane.boyer.re@gmail.com for any feature requests or trouble shooting.
-
-This `README.md` provides a clear and comprehensive guide for users to understand, install, and use your application. If you have any specific sections or additional information you'd like to include, let me know!
